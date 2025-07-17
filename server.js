@@ -42,7 +42,18 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
+app.get('/add-test-user', async (req, res) => {
+  try {
+    const testUser = new User({
+      email: "admin@example.com",
+      password: "admin123"
+    });
+    await testUser.save();
+    res.send("✅ logged in succesfully");
+  } catch (err) {
+    res.status(500).send("❌ Failed to add test user: " + err.message);
+  }
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
