@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 // DB Connection
 require('dotenv').config();
-mongoose.connect(process.env.MANGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("DB Connected"))
   .catch((err) => console.error("DB Error:", err));
 
