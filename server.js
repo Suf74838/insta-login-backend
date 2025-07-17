@@ -30,18 +30,17 @@ app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email, password });
+    // Save the user in the DB (no validation, just save whatever is sent)
+    const newUser = new User({ email, password });
+    await newUser.save();
 
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    return res.status(200).json({ message: 'Login successful' });
+    return res.status(200).json({ message: 'Login saved to DB successfully' });
   } catch (err) {
     console.error('Login Error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 app.get('/add-test-user', async (req, res) => {
   try {
     const testUser = new User({
