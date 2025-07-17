@@ -1,58 +1,32 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-
+const path = require('path');
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
+
+// DB Connection
+require('dotenv').config();
+mongoose.connect(process.env.MANGO_URI)
+  .then(() => console.log("DB Connected"))
+  .catch((err) => console.error("DB Error:", err));
+
+// Middleware
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+// Serve static files (your login page)
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Load model
-const User = require('./models/User'); // ⚠ Ensure casing matches the file
-
-// Routes
-app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const newUser = new User({ email, password });
-    await newUser.save();
-    res.status(201).json({ message: 'User created' });
-  } catch (err) {
-    res.status(500).json({ message: 'Error creating user', error: err.message });
-  }
-});
-
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = new User({ email, password });
-      await user.save();
-      return res.json({ message: 'User auto-registered and logged in', user });
-    }
-    if (user.password === password) {
-      return res.json({ message: 'Login successful', user });
-    } else {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
+// Optional route to serve index.html
 app.get('/', (req, res) => {
-  res.send('✅ API is running!');
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-const PORT = process.env.PORT || 5000;
+// Your /login POST route
+app.post('/login', async (req, res) => {
+  // login logic...
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server started on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
